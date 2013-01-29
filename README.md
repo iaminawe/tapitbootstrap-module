@@ -1,14 +1,14 @@
 # tapitbootstrap Module
 
-The tapitbootstrap Module is is an extension module to the [tapitbootstrap Theme](https://github.com/patrickocoffeyo/tapitbootstrap). It allows users to proplerly add blocks, and pages that make full use of Twitter Bootstrap to their Drupal projects without adding Bootstrap into the module.
+The Tapit bootstrap Module is is an extension module to the Tapitbootstrap Theme which is a fork of Base Building Blocks module by [Patricko Coffeyo] (https://github.com/patrickocoffeyo). It allows users to proplerly add blocks, and pages that make full use of Twitter Bootstrap to their Drupal projects without adding Bootstrap into the module.
 
-It ships with a parent module that makes sure [tapitbootstrap Theme](https://github.com/patrickocoffeyo/tapitbootstrap) is installed and in use (Remember, these modules need Bootstrap!), and a collection of submodules that create completely customizeable Bootstrap Navbars, Administration Menus, standard menus in Bootstrap Dropdown Form, and more.
+It ships with a parent module that makes sure Tapitbootstrap Theme is installed and in use (Remember, these modules need Bootstrap!), and a collection of submodules that create completely customizeable Bootstrap Navbars, Administration Menus, standard menus in Bootstrap Dropdown Form, and more.
 
 ## Requirements
-The tapitbootstrap Module requires that you use [tapitbootstrap Theme](https://github.com/patrickocoffeyo/tapitbootstrap), as it is an extension to that theme.
+The Tapitbootstrap Module requires that you use Tapitbootstrap Theme, as it is an extension to that theme.
 
 ## Installation
-Installation is simple. Make sure that the [tapitbootstrap Theme](https://github.com/patrickocoffeyo/tapitbootstrap) is enabled and set as default, then enable the tapitbootstrap module. A default set of submodules will be enabled.
+Installation is simple. Make sure that the tapitbootstrap Theme  is enabled and set as default, then enable the tapitbootstrap module. A default set of submodules will be enabled.
 
 ## Configuration
 All configuration pages are added under admin/appearance/tapitbootstrap. You can customize each submodule (subtabs) there.
