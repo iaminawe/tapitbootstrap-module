@@ -1,0 +1,24 @@
+<?php
+//Includes
+include('includes/admin.inc');
+
+/**
+ * Impliments hook_menu
+ */
+function tapitbootstrap_module_menu() {
+  $items = array();
+  $items['admin/appearance/tapitbootstrap'] = array(
+    'title' => t('Tap it bootstrap'),
+    'access arguments' => array('administer themes'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tapitbootstrap_settings_form'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/appearance/tapitbootstrap/settings'] = array(
+    'title' => 'Main',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10
+  );
+
+  return $items;
+}

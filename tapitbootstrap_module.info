@@ -1,0 +1,7 @@
+name = tapitbootstrap
+description = Module that extends the Tapitbootstrap Theme. Parent module for all Tapitbootstrap submodules.
+version = 7.x-1.0.0
+package = tapitbootstrap
+core = 7.x
+
+configure = admin/appearance/tapitbootstrap

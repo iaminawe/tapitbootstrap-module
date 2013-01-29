@@ -1,0 +1,210 @@
+<?php
+//Includes
+include('includes/admin.inc');
+
+/**
+ * Impliments hook_menu
+ */
+function tapitbootstrap_menu_menu() {
+  $items = array();
+  $items['admin/appearance/tapitbootstrap/menu'] = array(
+    'title' => t('Menu Settings'),
+    'page arguments' => array(3),
+    'access arguments' => array('administer themes'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tapitbootstrap_menu_settings_form'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function tapitbootstrap_menu_block_info() {
+  $blocks = array();
+  
+  for ($i = 0; $i <= variable_get('menu_block_count'); $i++) {
+    $blocks['standard_menu_'.$i] = array(
+      'info' => t('Bootstrap Menu '.($i + 1)),
+    );
+  }
+  
+  for($i = 0; $i <= variable_get('mobile_menu_block_count'); $i++) {
+    $blocks['mobile_menu_'.$i] = array(
+      'info' => t('Mobile Menu '.($i + 1)),
+    );
+  }
+
+  return $blocks;
+}
+
+/**
+ * Implimenting hook_block_view()
+ */
+function tapitbootstrap_menu_block_view($delta = '') {
+  $block = array();
+  $block['subject'] = t('');
+  
+  //If this is the mobile menu..
+  if (strpos($delta, 'mobile') !== false) {
+    $block['content'] = drupal_get_form('tapitbootstrap_menu_select_menu_form', variable_get($delta.'_menu'));
+  }
+  else {
+    $block['content'] = tapitbootstrap_menu_build_menu(variable_get($delta.'_menu'), $delta);
+  }
+
+  return $block;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function tapitbootstrap_menu_block_configure($delta = '') {
+  $form = array();
+  
+  //Grab the menus within the system, and put them in an array we can use
+  $menus = menu_get_names();
+  $menu_options = array();
+  
+  foreach ($menus as $menu) {
+    $menu_options[$menu] = $menu;
+  }
+
+  $form[$delta.'_menu'] = array(
+    '#type' => 'select',
+    '#title' => t('Source Menu'),
+    '#options' => $menu_options,
+    '#default_value' => variable_get($delta.'_menu'),
+  );
+  $form[$delta.'_icons'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Icons'),
+    '#default_value' => variable_get($delta.'_icons'),
+    '#description' => t('Determines what Font Awesome icon should be printed before each menu item in  based off of the menu items title. (For example: My Menu Link Title | icon-font-awesome-preset)'),
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function tapitbootstrap_menu_block_save($delta, $edit) {
+  variable_set($delta.'_icons', $edit[$delta.'_icons']);
+  variable_set($delta.'_menu', $edit[$delta.'_menu']);
+}
+
+/**
+ * Build a menu
+ * @param $menu_name
+ *   Name of menu to pull from Drupal/build
+ * @param $block_name
+ *   Name of block that the menu will belong too
+ */
+function tapitbootstrap_menu_build_menu($menu_name, $block_name = '') {
+  return theme('standard_menu', array(
+    'menu' => menu_tree_all_data($menu_name),
+    'block_name' => $block_name,
+  ));
+}
+
+/**
+ * Returns TRUE if passed in path is current path
+ * @params $path
+ *   Path to check against the current path
+ * @return
+ *   BOOL TRUE or FALSE value, indicating whether or not the current menu item is active
+ */
+function tapitbootstrap_menu_is_active($path) {
+  if ($path == $_GET['q'] || (drupal_is_front_page() && $path === '<front>')) {
+    return TRUE;
+  }
+  
+  return FALSE;
+}
+
+/**
+ * Returns html icon for an menu link
+ * @param $link_title
+ *   Title of the link to grab the icon for
+ * @param $block_name
+ *   Name of block to get the icon settings from
+ * @return
+ *   HTML for the Font Awesome icon from the passed-in $link_title
+ * 
+ * Makes use of list_extract_allowed_values() from the field_list module
+ */
+function tapitbootstrap_menu_get_link_icon($link_title, $block_name = '') {
+  $menu_icons = variable_get($block_name.'_icons');
+  $array = list_extract_allowed_values($menu_icons, 'list_text', FALSE);
+
+  if (isset($array[$link_title])) {
+    $icon = '<i class="'.$array[$link_title].'"></i>';
+  } 
+  else {
+    $icon = '';
+  }
+
+  return $icon;
+}
+
+/**
+ * Implimenting hook_form
+ * Form for the select list menu
+ * @param $menu_name
+ *   Name of menu to print as a select list
+ */
+function tapitbootstrap_menu_select_menu_form($form, &$form_state, $menu_name) {
+   
+   //Grab the menu items for the passed in menu name
+   $menu_items =  menu_tree_all_data($menu_name);
+   
+   //Construct a menu array for the form
+   $menu = array();
+   $menu[''] = t('Go to...');
+   foreach ($menu_items as $menu_item) {
+     $menu[url($menu_item['link']['link_path'])] = $menu_item['link']['link_title'];
+   }
+   
+   //Add the javascript to handle the on-click events
+   drupal_add_js('
+    jQuery(document).ready(function () { 
+      jQuery(".mobile-select-menu select").change(function() {
+        window.location = $(this).find("option:selected").val();
+      });
+    });',
+    array(
+      'type' => 'inline', 
+      'scope' => 'footer', 
+      'weight' => 5
+    )
+  );
+
+  //Construct the form
+  $form['#attributes'] = array(
+    'class' => array('mobile-select-menu'),
+  );
+  $form['select'] = array(
+    '#type' => 'select',
+    '#options' => $menu,
+  );
+  
+  return $form;
+}
+
+/**
+ * Implimenting hook_theme();
+ */
+function tapitbootstrap_menu_theme() {
+  return array(
+    'standard_menu' => array(
+      'template' => 'templates/standard_menu',
+      'variables' => array(
+        'menu' => '',
+        'block_name' => '',
+      ),
+    ),
+  );
+}

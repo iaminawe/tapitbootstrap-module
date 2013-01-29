@@ -1,0 +1,43 @@
+<?php
+/**
+ * Implimenting hook_requirements()
+ * This module requires that the tapitbootstrap theme
+ * be enabled and in use to operate properly.
+ */
+function tapitbootstrap_module_requirements($phase) {
+  $default_theme = variable_get('theme_default');
+  $requirements = array();
+
+  //Everything is ok by default
+  $requirements['current_theme'] = array(
+    'title' => t('Default'),
+    'value' => t('Enabled'),
+    'severity' => REQUIREMENT_OK,
+  );
+
+  //Make sure that Tap-it Bootstrap is the enabled and used theme
+  if ($default_theme != 'tapitbootstrap') {
+    $requirements['current_theme'] = array(
+      'title' => t('tapitbootstrap theme not enabled'),
+      'value' => t('Disabled'),
+      'severity' => REQUIREMENT_ERROR,
+      'description' => t('To use the tapitbootstrap Module, you must download and enable the tapitbootstrap theme.'),
+    );
+  }
+
+  return $requirements;
+}
+
+/**
+ * Impliments hook_install()
+ */
+function tapitbootstrap_module_install() {
+
+  //Enable some submodules
+  $module_list = array(
+    'tapitbootstrap_menu',
+    'tapitbootstrap_navbar'
+  );
+
+  module_enable($module_list, TRUE);
+}
